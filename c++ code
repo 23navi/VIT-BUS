@@ -1,0 +1,1051 @@
+//
+//  main.cpp
+//  dsa project
+//
+//  Created by Navi Sureka on 16/04/20.
+//  Copyright © 2020 IL. All rights reserved.
+
+
+
+
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <map>
+
+
+
+
+using namespace std;
+
+//a class for the data of the main database list
+class mainData{
+public:
+    string name;
+    string regNo;
+    int avail;
+    int used;
+    mainData(){
+        avail=0;
+        used=0;
+    }
+    
+    
+};
+
+//An array of student details in main database
+
+mainData *list =new mainData[1000];
+int allTranCount=0;
+int allMoneyCount=0;
+
+
+
+
+class queue_nodes{
+public:
+    string regNo;
+    int credit;
+    
+    queue_nodes(){
+        credit=0;
+    }
+    
+};
+
+
+queue_nodes bus1[500];
+queue_nodes bus2[500];
+queue_nodes bus3[500];
+queue_nodes bus4[500];
+queue_nodes bus5[500];
+queue_nodes bus6[500];
+int b1=0;
+int b2=0;
+int b3=0;
+int b4=0;
+int b5=0;
+int b6=0;
+
+
+void increment(int tempBus){
+    switch (tempBus) {
+        case 1:
+            b1++;
+            break;
+        case 2:
+            b2++;
+        break;
+        case 3:
+            b3++;
+        break;
+        case 4:
+            b4++;
+        break;
+        case 5:
+            b5++;
+        break;
+        case 6:
+            b6++;
+        break;
+            
+        default:
+            break;
+    }
+        
+}
+
+
+void addToBus(int tempBus,int mem,string regno){
+    switch (tempBus) {
+        case 1:
+            bus1[b1].regNo=regno;
+            bus1[b1].credit=mem;
+            break;
+        case 2:
+            bus2[b2].regNo=regno;
+            bus2[b2].credit=mem;
+        break;
+        case 3:
+            bus3[b3].regNo=regno;
+            bus3[b3].credit=mem;
+        break;
+        case 4:
+            bus4[b4].regNo=regno;
+            bus4[b4].credit=mem;
+        break;
+        case 5:
+            bus5[b5].regNo=regno;
+            bus5[b5].credit=mem;
+        break;
+        case 6:
+            bus6[b6].regNo=regno;
+            bus6[b6].credit=mem;
+        break;
+            
+        default:
+            break;
+    }
+}
+
+
+
+
+class busCirQueue {
+private:
+
+
+public:
+    int front;
+    int rear;
+    
+    queue_nodes arr[500];
+
+    busCirQueue() { //constructor
+        front =-1;
+        rear = -1;
+        
+//        for (int i{0};i<500;i++)
+//            arr[i]=0;
+}
+
+
+    int busTotalCreditColloction=0;
+   int n = 500;
+    int itemcount {0};
+
+
+    // isempty
+
+    bool isempty() {
+        if (front==-1 && rear==-1)
+            return true;
+        else
+            return false;
+    }
+
+    //isfull
+
+    bool isfull() {
+        if ((rear+1)%500==front)
+            return true;
+        else
+            return false;
+    }
+
+    //Enqueue
+
+    void enqueue(int index,string regNo,int credit) {
+        if (isfull())
+        {
+            return;  //This will terminate the function without any changes
+
+        }
+        else if (isempty()){
+            rear=0;
+            front=0;
+            busTotalCreditColloction+=credit;
+            arr[rear].regNo=regNo;
+            arr[rear].credit=credit;
+            itemcount++;
+
+        }
+
+        else{
+            busTotalCreditColloction+=credit;
+            rear=(rear+1)%500;
+            arr[rear].regNo=regNo;
+            arr[rear].credit=credit;
+            itemcount++;
+        }
+    }
+
+    //dequeue
+
+    void dequeue() {
+        if (isempty()){
+
+        }
+        else if(rear==front){  //This is true only when both front and rear is equal to 0....only one element in the queue
+            //rear==0
+            //front==0
+            //raer==front
+             //when we remove the element we have to set that place as 0
+            rear =-1;
+            front=-1; //after removing it again go back to one place back
+            itemcount--;
+
+
+        }
+        else
+        {
+
+            front=(front+1)%n;
+            itemcount--;
+
+        }
+    }
+
+
+
+
+    //count
+    // It have to be changed for circular queue
+    int count() {
+        return itemcount;
+
+    }
+};
+
+
+busCirQueue queueBus[6];
+
+
+
+
+int noOfReg=0; // No of students registered on the app
+bool online=false;   // status of driver's phone
+
+
+
+string * regList=new string[1000]; //list of student registeration number for easy search
+string * nameList=new string[1000];  //list of student name for easy search
+string * driverIDList=new string[10];  //list of driver emp number for easy search
+
+
+
+// payment gateway function
+
+
+bool payment(int amo){
+    cout<<endl;
+    cout<<"Pay "<<amo<<endl;
+    char con='Y';
+    cout<<"Press Y to confirm or N to deny"<<endl;
+    cin>>con;
+    cout<<endl;
+    if(con=='Y'|| con=='y'){
+        cout<<"Payment successful"<<endl;
+        return true;
+    }
+    else{
+        cout<<"Payment failed"<<endl;
+        return false;
+    }
+}
+
+
+
+
+//student class with all basic information
+
+class student{
+private:
+    string name;
+    string regNo;
+    int credit;
+    string password;
+    
+    
+public:
+    
+    student()
+    {
+        this->name="";
+    }
+    
+    void update(string name,string regNo,string password="abc123")
+    {
+        this->name=name;
+        this->regNo=regNo;
+        this->password=password;
+        this->credit=0;
+        
+    }
+    
+    
+    void showCredit(){
+        cout<<"Available credit is "<<credit<<endl;
+    }
+    
+    int getCredit(){
+           return credit;
+       }
+    
+    void changePassword(string pass){
+        this->password=pass;
+        cout<<"Password updated"<<endl;
+    }
+    
+    void details(){
+        cout<<"Name: "<<name<<endl;
+        cout<<"regNo.: "<<regNo<<endl;
+        cout<<"credit: "<<credit<<endl;
+    }
+    
+    void setCredit(int cre){
+        credit=cre;
+    }
+    
+  
+    
+    string getRegNo(){
+        return regNo;
+    }
+    
+    string getPass(){
+        return password;
+    }
+    
+    string getName(){
+        return name;
+    }
+    
+    
+};
+
+student s[1000]; // An array of student objects
+
+
+
+
+//function to add credits to student account after successful payments
+
+void addCredit(student &s ,int index){
+    int addCr;
+    cout<<"How many credits do you want to add??"<<endl;
+    cin>>addCr;
+    cout<<"You need to pay "<<15*addCr<<endl;
+    if(payment(15*addCr)){     //redirects to payment gateway function
+        s.setCredit(addCr);   // adds to student profile after successful payment
+        list[index].name=s.getName();  //set user details to main database on successful payment
+        list[index].regNo=s.getRegNo();
+        list[index].avail=s.getCredit(); // increase the number of available rides of students
+    }
+}
+
+
+
+
+
+//class for driver with all informations and functions
+
+class driver{
+private:
+    string name;
+    string password;
+    string empID;
+    int amountReceived;
+    int busNo;
+    
+public:
+    driver(){
+        name="";
+        busNo=0;
+    }
+    
+    
+    void updateDriver(string name,string empID,string password="abc123"){
+        this->name=name;
+        this->password=password;
+        this->empID=empID;
+        amountReceived =0;
+    }
+        
+    
+    void changePassword(string pass){
+        this->password=pass;
+        cout<<"Password updated"<<endl;
+    }
+    
+    
+    string getPass(){
+        return password;
+    }
+    
+    void details(){
+        cout<<"Name: "<<name<<endl;
+        cout<<"empID.: "<<empID<<endl;
+        cout<<name<<" drives no. "<<busNo;
+        cout<<endl;
+        
+    }
+    
+    void setBusNo(int busno){
+        this->busNo=busno;
+    }
+    
+};
+
+
+
+driver d[10]; //array of objects of driver
+
+
+
+
+//Function which will give the current location of bus to user
+
+void trackBus(){
+    int busNo;
+    cout<<"Enter the Bus Number"<<endl;
+    cin>>busNo;
+    switch (busNo){
+        case 1:{
+            cout<<"Bus is at Main Gate"<<endl;
+            break;
+        }
+        case 2:{
+            cout<<"Bus is at SJT"<<endl;
+            break;
+        }
+        case 3:{
+            cout<<"Bus is at TT"<<endl;
+            break;
+        }
+        case 4:{
+            cout<<"Bus is at SMV"<<endl;
+            break;
+        }
+        case 5:{
+            cout<<"Bus is at MEN'S HOSTEL"<<endl;
+            break;
+        }
+        case 6:{
+            cout<<"Bus is out of service"<<endl;
+            break;
+        }
+        default:{
+            cout<<"There are only 6 bus in VIT"<<endl;
+            break;
+        }
+        
+    }
+}
+
+
+
+// This function gives the status of driver phone (internet connectivity)
+
+bool isOnline(){
+    if (online){
+        return true;
+    }
+    return false;
+}
+
+
+
+
+// prototype functionss and initial decelatations
+void studentLogin();
+
+void studentSignUp();
+
+void driverLogin();
+
+string intOption;
+
+int doOptionS;
+
+int doOptionD;
+
+void initilizeS();
+
+void initilizeD();
+
+int finalOut;
+
+
+
+// Setting us the student's menu
+
+void studentint(){
+    if(doOptionS==1){
+        cout<<" \n        Student Login"<<endl;
+        studentLogin();
+    }
+    else if(doOptionS==2){
+        cout<<"         Student signup"<<endl;
+        studentSignUp();
+    }
+    else{
+        cout<<"Sorry Invalid input"<<endl;
+        initilizeS();
+    }
+}
+
+
+// Setting us the driver's menu
+
+void driverint(){
+    if(doOptionD==0){
+           cout<<"          Driver Login"<<endl;
+        driverLogin();
+       }
+    else{
+           cout<<"Sorry Invalid input"<<endl;
+           initilizeD();
+       }
+
+}
+
+void initilize();
+
+//function if details given was wrong
+
+void initilizeSS(string str){
+    cout<<str<<endl;
+    cout<<"Press 1 to login or press 2 to signup"<<endl;
+    cin>>doOptionS;
+    studentint();
+}
+void adminint();
+void initilizeAA(){
+    cout<<"Sorry wrong details"<<endl;
+    adminint();
+}
+
+
+
+void displayAllTransections(int);
+void adminint(){
+    string temp_id;  //taking in id from admin
+    string temp_pass;   //taking in password from user
+    cout<<"Enter the ADMIN_ID."<<endl;
+    cin>>temp_id;
+    cout<<"Enter the password"<<endl;
+    cin>>temp_pass;
+    if(temp_pass=="abc123" && temp_id=="admin"){
+        cout<<"----------------Welcome to ADMIN section--------------"<<endl;
+        // check all bus status
+        cout<<"Press 1 to view all transections of today"<<endl;
+        cout<<"Press 2 to view transections of a perticular bus"<<endl;
+        cout<<"Press 3 to logout"<<endl;
+        int option=0;
+        do{
+            cout<<"Enter your option"<<endl;
+            cin>>option;
+            switch (option) {
+                case 1:{
+                    cout<<"Total Unique Transection in all 6 bus combined are "<<allTranCount<<endl;
+                    cout<<"Total money collected in all 6 bus combined is RS"<<allMoneyCount*15<<endl;
+                    cout<<endl;
+                    for(int i=0;i<allTranCount;i++){
+                        if(list[i].name!=""){
+                        cout<<"Name :            "<<list[i].name<<endl;
+                        cout<<"RegNo. :          "<<list[i].regNo<<endl;
+                        cout<<"Available Credit: "<<list[i].avail<<endl;
+                        cout<<"Used Credit: "<<list[i].used<<endl;
+                        cout<<endl;
+                    }
+                    }
+                }
+                    break;
+                case 2:{
+                    cout<<"Enter the bus Number"<<endl;
+                    int bnum=1;
+                    cin>>bnum;
+                    if (bnum>0&&bnum<7){
+                        displayAllTransections(bnum-1);
+                    }
+                }
+                    
+                    break;
+                
+                case 3:
+                    initilize();
+                    break;
+                    
+                default:
+                    break;
+            }
+        }while(true);
+        //check the main dataBase
+    }
+    else{
+        initilizeAA();
+    }
+}
+
+
+void initilizeA(){
+    cout<<"        ADMIN SECTION"<<endl;
+    adminint();
+}
+
+
+
+
+
+
+// function to set up student object
+
+void initilizeS(){
+    cout<<"        Welcome Student"<<endl;
+    cout<<"Press 1 to login or press 2 to signup"<<endl;
+    cin>>doOptionS;
+    studentint();
+}
+
+
+
+// function to set up driver object
+
+void initilizeD(){
+    cout<<"        Welocme Driver"<<endl;
+    cout<<"Press 0 to login"<<endl;
+    cin>>doOptionD;
+    driverint();
+}
+
+
+//function if details given was wrong
+
+void initilizeDD(string str){
+    cout<<str<<endl;
+    cout<<"Press 0 to login"<<endl;
+    cin>>doOptionD;
+    driverint();
+}
+
+
+void initilize(){
+    cout<<"For Student press S and for Driver press D"<<endl;
+    cout<<"        Press A to login as admin"<<endl;
+    
+    cin>>intOption;
+    
+    if(intOption=="S" || intOption=="s"){
+        initilizeS();
+    }
+    
+    else if(intOption=="d" || intOption=="D"){
+        initilizeD();
+    }
+    else if(intOption=="a" || intOption=="A"){
+        initilizeA();
+    }
+    else{
+        cout<<"Invalid input! Try again"<<endl;
+        initilize();
+    }
+    
+}
+
+
+
+bool checkRegExist(string regNo){
+    for(int i=0;i<1000;i++){
+        if(regNo==regList[i]){
+            return true;
+        }
+    }
+    return false;
+
+
+}
+
+
+
+int getIndex(string regNo){
+    for(int i=0;i<1000;i++){
+        if(regNo==regList[i]){
+            return i;
+        }
+    }
+    return -1;
+}
+
+
+
+
+
+//student login page
+
+void studentLogin(){
+    string temp_regNo;
+    string temp_pass;
+    cout<<"Enter the regNo."<<endl;
+    cin>>temp_regNo;
+    cout<<"Enter the password"<<endl;
+    cin>>temp_pass;
+    
+    if (checkRegExist(temp_regNo)){
+        if (s[getIndex(temp_regNo)].getPass()==temp_pass){
+            cout<<"Login successfull \n"<<endl;
+            s[getIndex(temp_regNo)].details();
+            cout<<endl;
+            int option=0;
+            cout<<"Press 1 to Track Bus"<<endl;
+            cout<<"Press 2 for Payments"<<endl;
+            cout<<"Press 3 to change password"<<endl;
+            cout<<"Press 4 to add credit"<<endl;
+            cout<<"Press 5 to display credit"<<endl;
+            cout<<"Press 6 to LogOut"<<endl;
+            cout<<"7 to display main database data"<<endl;
+            
+            do{
+                cout<<"Enter your option"<<endl;
+                cin>>option;
+                switch (option) {
+                    case 0:
+                        cout<<"Exit! Good Byeeee"<<endl;
+                        break;
+                        
+                    case 1:
+                        trackBus();
+                    break;
+                        
+                    case 2:{
+                        cout<<"Enter the bus Number you are riding on"<<endl;
+                        
+                        int tempBus;
+                        cin>>tempBus;
+                        if(tempBus<7){
+                        
+                        cout<<"How many members"<<endl;
+                        int mem=1;
+                        cin>>mem;
+                        if(mem>s[getIndex(temp_regNo)].getCredit()){
+                            cout<<"Sorry you just have "<<s[getIndex(temp_regNo)].getCredit();
+                            cout<<" credit! Please Add "<<mem-s[getIndex(temp_regNo)].getCredit()<<" credits"<<endl;
+                        }
+                        else{
+                            // logicccccc //
+                            allTranCount++;
+                            
+                            list[getIndex(temp_regNo)].used+=mem;
+                            list[getIndex(temp_regNo)].avail-=mem;
+                            s[getIndex(temp_regNo)].setCredit(s[getIndex(temp_regNo)].getCredit()-mem);
+                            addToBus(tempBus,mem,temp_regNo);
+                            increment(tempBus);
+                            queueBus[tempBus-1].enqueue(getIndex(temp_regNo), temp_regNo, mem);
+                            allMoneyCount+=mem;
+                            
+                        
+                            
+                            
+                            cout<<"Payment Successful \n"<<endl;
+                        }
+                        }
+                        else{
+                            cout<<"Sorry there are only 6 bus in vit"<<endl;
+                        }
+                    break;
+                    }
+                    case 3:{
+                        cout<<"Enter new password"<<endl;
+                        string change_pass;
+                        cin>>change_pass;
+                        s[getIndex(temp_regNo)].changePassword(change_pass);
+                        break;
+                    }
+                        
+                    case 4:{
+                        addCredit(s[getIndex(temp_regNo)],getIndex(temp_regNo));
+                        break;
+                    }
+                        
+                    case 5:{
+                        s[getIndex(temp_regNo)].showCredit();
+                        break;
+                    }
+                    
+                        
+                    case 6:{
+                        initilize();
+                        break;
+                    }
+                    
+                        
+                    case 7:{
+                        cout<<"Name: "<<list[getIndex(temp_regNo)].name<<endl;
+                        cout<<"RegNo. "<<list[getIndex(temp_regNo)].regNo<<endl;
+                        cout<<"Available credits: "<<list[getIndex(temp_regNo)].avail<<endl;
+                        cout<<"Credits Used till now: "<<list[getIndex(temp_regNo)].used<<endl;
+                        break;
+                    }
+                        
+                        
+                    default:
+                        break;
+                }
+            }while(true);
+        }
+        else{
+            initilizeSS("Sorry wrong password " );
+        }
+    }
+    else{
+        
+        initilizeSS("Sorry this user doesn't exist" );
+        
+    }
+    
+}
+
+
+
+
+
+//sign up function for student
+
+void studentSignUp(){
+    cout<<"Welcome new user"<<endl;
+    string temp_name;
+    string temp_regNo;
+    cout<<"Enter your regNo."<<endl;
+    cin>>temp_regNo;
+    if (checkRegExist(temp_regNo)){  //check is student with same id exist
+        cout<<"Sorry user with this regNo. already exist"<<endl;
+        initilizeSS("" );
+    }
+    else{
+        cout<<"Enter your name"<<endl;
+        cin>>temp_name;
+        //setting up the profile
+        regList[noOfReg]=temp_regNo;
+        nameList[noOfReg]=temp_name;
+        s[noOfReg].update(temp_name, temp_regNo);
+        cout<<"Account created! Please Login"<<endl;
+        cout<<"Your Default password is 'abc123' ! You can change it later"<<endl;
+        cout<<endl;
+        noOfReg++;
+        studentLogin(); //after signup it will go to login page
+        
+}
+}
+
+
+//Function that check if that emp exist
+
+bool checkempExist(string empID){
+    for(int i=0;i<10;i++){
+        if(empID==driverIDList[i]){
+            return true;
+        }
+    }
+    return false;
+}
+
+
+//if that emp exist.. its index
+int getIndexD(string empid){
+    for(int i=0;i<10;i++){
+        if(empid==driverIDList[i]){
+            return i;
+        }
+    }
+    return -1;
+}
+
+
+
+
+
+void cashInHand(int busNumber){
+    cout<<"Total cash collected "<<queueBus[busNumber].busTotalCreditColloction*15<<" RS"<<endl;
+}
+
+void displayAllTransections(int busNumber){
+    cout<<"Total Unique transection today "<<queueBus[busNumber].itemcount<<endl;
+    cout<<"Total cash collected "<<queueBus[busNumber].busTotalCreditColloction*15<<" RS"<<endl;
+    for(int i=0;i<queueBus[busNumber].itemcount;i++){
+        
+        cout<<"RegNO. :"<<queueBus[busNumber].arr[i].regNo<<" --> "<<queueBus[busNumber].arr[i].credit*15<<" RS"<<endl;
+    }
+}
+
+
+void busPaymentHistory(int busNumber){
+    switch (busNumber) {
+        case 1:
+            for(int i=0;i<b1;i++){
+                cout<<bus1[i].regNo<<" --> "<<bus1[i].credit<<endl;
+            }
+            break;
+        case 2:
+        for(int i=0;i<b2;i++){
+            cout<<bus2[i].regNo<<" --> "<<bus2[i].credit<<endl;
+        }
+        break;
+        case 3:
+        for(int i=0;i<b3;i++){
+            cout<<bus3[i].regNo<<" --> "<<bus3[i].credit<<endl;
+        }
+        break;
+        case 4:
+        for(int i=0;i<b4;i++){
+            cout<<bus4[i].regNo<<" --> "<<bus4[i].credit<<endl;
+        }
+        break;
+        case 5:
+        for(int i=0;i<b5;i++){
+            cout<<bus5[i].regNo<<" --> "<<bus5[i].credit<<endl;
+        }
+            case 6:
+            for(int i=0;i<b6;i++){
+                cout<<bus6[i].regNo<<" --> "<<bus6[i].credit<<endl;
+            }
+            break;
+        break;
+        default:
+            break;
+    }
+        
+        }
+
+
+
+// function for driver's login (This will do all employ id and password verification)
+
+void driverLogin(){
+    string temp_empID;  //taking in id from user
+    string temp_pass;   //taking in password from user
+    cout<<"Enter the empID."<<endl;
+    cin>>temp_empID;
+    cout<<"Enter the password"<<endl;
+    cin>>temp_pass;
+    
+    if (checkempExist(temp_empID)){    //checking if user with that id exixt or not
+        if (d[getIndexD(temp_empID)].getPass()==temp_pass){    //if user exist ...do the password checking
+            cout<<"Login successfull \n"<<endl;
+            d[getIndexD(temp_empID)].details(); //display the details of the driver
+            cout<<endl;
+            int option=0;
+            // oprion driven menu
+            cout<<"Press 1 to Select Bus"<<endl;
+            cout<<"Press 2 to display received cash"<<endl;
+            cout<<"Press 3 to display all payments"<<endl;
+            cout<<"Press 4 to LogOut"<<endl;
+            
+            do{
+                cout<<"Enter your option"<<endl;
+                cin>>option;
+                switch (option) {
+
+                        
+                    case 1:
+                        cout<<"Coming soon"<<endl;
+                    break;
+                        
+                    case 2:
+                        cashInHand(getIndexD(temp_empID) );
+                    break;
+                        
+                        
+                    case 3:
+                    {
+//                        busPaymentHistory(getIndexD(temp_empID)+1);
+                        displayAllTransections(getIndexD(temp_empID));
+                    }
+                        break;
+                        
+                    case 4:
+                        initilize();
+                    break;
+                    
+                        
+                    default:
+                        break;
+                }
+            }while(true);
+        }
+        else{ //if password is wrong for the given user
+            initilizeDD("Sorry wrong password!" );
+        }
+    }
+    else{
+        //if user do not exist
+        initilizeDD("Sorry this user doesn't exist" );
+        
+    }
+    
+}
+
+
+
+
+
+// Main function of the programm
+
+int main(){
+    
+    //Initializing all the drives of bus! (Drivers will be set by system admin)
+    
+    for(int i=1;i<11;i++){
+        string str="Driver";
+        string str2="EMP";
+        d[i-1].updateDriver(str+to_string(i), str2+to_string(i));
+        driverIDList[i-1]=str2+to_string(i);
+        
+        
+        //We have 6 bus in the sysyem so 1 driver will be set to each bus and remaining can switch places
+        if(i<7){
+            d[i-1].setBusNo(i);
+        }else{
+            d[i-1].setBusNo(0);
+        }
+    }
+    
+    
+    
+    
+    //Welcome screen of the app/software
+    
+    cout<<"--------------Welcome to VIT bus services---------------"<<endl;
+    cout<<"               Track bus and pay offline                 "<<endl;
+    cout<<"\n";
+    //getting to the main screen of the software.
+    initilize();
+
+    //defult admin id is 'admin';
+    //default admin password is 'abc123';
+    
+    //all drivers default id it 'EMP' and 1 to 6
+    
+    //all default passwords are 'abc123';
+   
+    
+}
